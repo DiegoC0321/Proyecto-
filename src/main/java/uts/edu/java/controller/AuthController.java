@@ -2,6 +2,9 @@ package uts.edu.java.controller;
 
 import uts.edu.java.entity.Usuario;
 import uts.edu.java.repository.UsuarioRepository;
+
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -49,7 +52,10 @@ public class AuthController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
+    public String dashboard(Model model, Principal principal) {
+        String correoElectronico = principal.getName();
+        Usuario usuario = usuarioRepository.findByCorreo(correoElectronico).orElse(null);
+        model.addAttribute("usuarioConectado", usuario);
+        return "dashboard"; // Asegúrate de que retorne la vista correcta
     }
 }
