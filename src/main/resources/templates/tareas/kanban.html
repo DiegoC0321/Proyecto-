@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tablero Kanban</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --bg:#f5f7fa; --surface:#fff; --surface-accent:#FCFCBB; --border:#FCFCBB; --text:#3a4354; --muted:#8a99ad; --accent:#cbdcf7; --accent-text:#4a6fa5; --accent-hover:#b8cff5; --sidebar-w:240px; }
+        body { font-family: 'Sora',sans-serif; color:var(--text); background:var(--bg); display:flex; min-height:100vh; }
+        .sidebar { width:var(--sidebar-w); background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:2rem 1rem 1.5rem; position:fixed; top:0; left:0; bottom:0; z-index:10; }
+        .sidebar-logo { font-size:1rem; font-weight:700; margin-bottom:2rem; padding:0 0.75rem; }
+        .nav-item { display:flex; align-items:center; gap:10px; padding:0.65rem 0.75rem; border-radius:10px; font-size:0.87rem; color:var(--text); text-decoration:none; margin-bottom:3px; transition:background 0.15s; }
+        .nav-item:hover { background:#f5f7fa; }
+        .nav-item.active { background:var(--accent); color:var(--accent-text); font-weight:500; }
+        .sidebar-bottom { margin-top:auto; }
+        .user-card { display:flex; align-items:center; gap:10px; padding:0.8rem; border-radius:12px; background:var(--surface-accent); }
+        .avatar { width:36px; height:36px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; color:var(--accent-text); flex-shrink:0; }
+        .user-name { font-size:0.82rem; font-weight:600; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .logout-btn { background:none; border:none; cursor:pointer; color:var(--muted); font-size:1rem; padding:2px 4px; }
+        .logout-btn:hover { color:#ef4444; }
+        .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+        .topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:1.2rem 2rem; display:flex; align-items:center; gap:1rem; position:sticky; top:0; z-index:5; }
+        .topbar-title { font-size:1.15rem; font-weight:600; }
+        .topbar-sub { font-size:0.82rem; color:var(--muted); margin-top:2px; }
+        .topbar-actions { margin-left:auto; display:flex; gap:8px; }
+        .btn-accent { display:inline-flex; align-items:center; gap:6px; background:var(--accent); border:none; border-radius:8px; padding:0.55rem 1rem; font-family:'Sora',sans-serif; font-size:0.85rem; color:var(--accent-text); font-weight:600; cursor:pointer; text-decoration:none; }
+        .btn-accent:hover { background:var(--accent-hover); }
+        .btn-back { display:inline-flex; align-items:center; gap:6px; background:#f5f7fa; border:1px solid #eef1f6; border-radius:8px; padding:0.55rem 1rem; font-family:'Sora',sans-serif; font-size:0.85rem; color:var(--text); text-decoration:none; }
+        .btn-back:hover { background:#eef1f6; }
+        .kanban-wrap { padding:1.5rem 2rem; flex:1; overflow-x:auto; }
+        .kanban { display:flex; gap:1.25rem; min-width:min-content; }
+        .col { flex:0 0 260px; background:var(--surface); border:1px solid var(--border); border-radius:14px; display:flex; flex-direction:column; }
+        .col-header { padding:1rem 1.1rem; border-bottom:1px solid var(--border); }
+        .col-title { font-size:0.85rem; font-weight:600; color:var(--accent-text); }
+        .col-body { padding:0.75rem; flex:1; overflow-y:auto; min-height:80px; }
+        .tarea-card { background:#fafbfc; border:1px solid #eef1f6; border-radius:10px; padding:0.9rem; margin-bottom:0.65rem; }
+        .tarea-titulo { font-size:0.85rem; font-weight:500; margin-bottom:0.35rem; }
+        .tarea-fecha { font-size:0.73rem; color:var(--muted); margin-bottom:0.5rem; }
+        .tarea-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:0.6rem; }
+        .tag-badge { font-size:0.68rem; padding:2px 7px; border-radius:20px; color:#fff; font-weight:500; }
+        .tarea-actions { display:flex; flex-direction:column; gap:4px; }
+        .mover-group { display:flex; flex-wrap:wrap; gap:4px; }
+        .btn-mover { font-size:0.7rem; padding:3px 7px; border-radius:6px; border:none; cursor:pointer; font-family:'Sora',sans-serif; background:#e8f0fe; color:var(--accent-text); white-space:nowrap; }
+        .btn-mover:hover { background:var(--accent); }
+        .btn-eliminar { font-size:0.7rem; padding:3px 7px; border-radius:6px; border:none; cursor:pointer; font-family:'Sora',sans-serif; background:#fce7e3; color:#a84c4c; }
+        .btn-eliminar:hover { background:#f9d0c8; }
+        .col-empty { text-align:center; color:var(--muted); font-size:0.8rem; padding:1.5rem 0.5rem; }
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sidebar-logo">📋 GestorApp</div>
+    <a class="nav-item" th:href="@{/dashboard}">🏠 Inicio</a>
+    <a class="nav-item active" th:href="@{/proyectos}">📁 Proyectos</a>
+    <div class="sidebar-bottom">
+        <div class="user-card">
+            <div class="avatar" th:text="${usuarioConectado != null ? #strings.toUpperCase(#strings.substring(usuarioConectado.nombre,0,1)) : 'U'}">U</div>
+            <div class="user-name" th:text="${usuarioConectado?.nombre}">Usuario</div>
+            <form th:action="@{/logout}" method="post" style="margin:0">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="logout-btn">✕</button>
+            </form>
+        </div>
+    </div>
+</aside>
+ 
+<div class="main">
+    <div class="topbar">
+        <div>
+            <div class="topbar-title" th:text="${proyecto.nombre}">Proyecto</div>
+            <div class="topbar-sub" th:text="${proyecto.descripcion ?: 'Sin descripción'}"></div>
+        </div>
+        <div class="topbar-actions">
+            <a th:href="@{/proyectos}" class="btn-back">← Proyectos</a>
+            <a th:href="@{/tareas/nueva/{id}(id=${proyecto.id})}" class="btn-accent">+ Nueva tarea</a>
+        </div>
+    </div>
+ 
+    <div class="kanban-wrap">
+        <div class="kanban">
+            <div class="col" th:each="estado : ${estados}">
+                <div class="col-header">
+                    <div class="col-title" th:text="${estado.nombreEstado}">Estado</div>
+                </div>
+                <div class="col-body">
+                    <th:block th:each="t : ${tareas}" th:if="${t.estado.id == estado.id}">
+                        <div class="tarea-card">
+                            <div class="tarea-titulo" th:text="${t.titulo}">Título</div>
+                            <div class="tarea-fecha" th:if="${t.fechaLimite != null}"
+                                 th:text="'Vence: ' + ${t.fechaLimite}"></div>
+                            <div class="tarea-tags" th:if="${!t.etiquetas.isEmpty()}">
+                                <span class="tag-badge"
+                                      th:each="e : ${t.etiquetas}"
+                                      th:style="'background:' + ${e.colorHex}"
+                                      th:text="${e.nombre}">Tag</span>
+                            </div>
+                            <div class="tarea-actions">
+                                <div class="mover-group">
+                                    <th:block th:each="est : ${estados}" th:if="${est.id != estado.id}">
+                                        <form th:action="@{/tareas/estado/{id}(id=${t.id})}" method="post" style="display:inline">
+                                            <input type="hidden" name="estadoId" th:value="${est.id}"/>
+                                            <input type="hidden" name="proyectoId" th:value="${proyecto.id}"/>
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                            <button type="submit" class="btn-mover" th:text="'→ ' + ${est.nombreEstado}"></button>
+                                        </form>
+                                    </th:block>
+                                </div>
+                                <form th:action="@{/tareas/eliminar/{id}/{pid}(id=${t.id},pid=${proyecto.id})}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn-eliminar"
+                                            onclick="return confirm('¿Eliminar esta tarea?')">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </th:block>
+ 
+                    <div class="col-empty" th:if="${tareas.isEmpty()}">Sin tareas aún</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

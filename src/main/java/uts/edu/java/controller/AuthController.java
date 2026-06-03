@@ -1,29 +1,25 @@
 package uts.edu.java.controller;
 
-import uts.edu.java.entity.Usuario;
-import uts.edu.java.repository.UsuarioRepository;
-
-import java.security.Principal;
-
+import uts.edu.java.entity.*;
+import uts.edu.java.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
+import java.util.List;
 
 @Controller
 public class AuthController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private ProyectoRepository proyectoRepository;
+    @Autowired private TareaRepository tareaRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
-    public String home() {
-        return "redirect:/login";
-    }
+    public String home() { return "redirect:/login"; }
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(value = "error", required = false) String error,
@@ -48,14 +44,23 @@ public class AuthController {
         }
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         usuarioRepository.save(usuario);
-        return "redirect:/login?registrado=true";
+        return "redirect:/login";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Principal principal) {
-        String correoElectronico = principal.getName();
-        Usuario usuario = usuarioRepository.findByCorreo(correoElectronico).orElse(null);
+        Usuario usuario = usuarioRepository.findByCorreo(principal.getName()).orElse(null);
+        List<Proyecto> proyectos = proyectoRepository.findByUsuarioOrderByFechaCreacionDesc(usuario);
+        List<Tarea> tareas = tareaRepository.findByProyectoIn(proyectos);
+        long pendientes = tareas.stream().filter(t -> t.getEstado().getNombreEstado().equals("Pendiente")).count();
+        long urgentes = tareas.stream().filter(t -> t.getFechaLimite() != null &&
+            !t.getFechaLimite().isAfter(java.time.LocalDate.now().plusDays(3))).count();
         model.addAttribute("usuarioConectado", usuario);
-        return "dashboard"; // Asegúrate de que retorne la vista correcta
+        model.addAttribute("proyectos", proyectos);
+        model.addAttribute("tareas", tareas);
+        model.addAttribute("totalProyectos", proyectos.size());
+        model.addAttribute("tareasPendientes", pendientes);
+        model.addAttribute("tareasUrgentes", urgentes);
+        return "dashboard";
     }
 }

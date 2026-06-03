@@ -1,3 +1,6 @@
+
+raw
+Dashboard · HTML
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
@@ -8,648 +11,179 @@
     <title>Panel de Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+        *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --bg: #f5f7fa;
             --surface: #ffffff;
-            --surface-accent: #FCFCBB; /* Tu amarillo pastel característico */
-            --surface2: #fafbfc;
+            --surface-accent: #FCFCBB;
             --border: #FCFCBB;
-            --border-focus: #b3c8f2;
-            
             --text: #3a4354;
             --muted: #8a99ad;
-            
-            --accent-pastel: #cbdcf7; /* Azul celeste pastel de tu login */
-            --accent-text: #4a6fa5;   
+            --accent: #cbdcf7;
+            --accent-text: #4a6fa5;
             --accent-hover: #b8cff5;
-            
-            --success-bg: #e2f3e2;
-            --success-text: #437043;
-            --amber-bg: #fef3c7;
-            --amber-text: #d97706;
-            --error-bg: #fce7e3;
-            --error-text: #a84c4c;
-            
             --sidebar-w: 240px;
-            --link-color: #557fa8;
         }
-
-        body {
-            font-family: 'Sora', sans-serif;
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            background-color: var(--bg);
-            background-image: url('/img/fondo2.jpg');
-            background-repeat: no-repeat;
-            background-position: right center;
-            background-size: contain;
-            background-attachment: fixed;
-        }
-
-        /* ── SIDEBAR SIMPLIFICADO ── */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 2rem 1rem 1.5rem 1rem;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            z-index: 10;
-        }
-
-        .nav-section-label {
-            font-size: 0.72rem; 
-            font-weight: 600; 
-            text-transform: uppercase;
-            letter-spacing: 0.05em; 
-            color: var(--muted);
-            padding: 0 0.75rem; 
-            margin-bottom: 0.6rem; 
-            margin-top: 1.5rem;
-        }
-
-        .nav-item {
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            padding: 0.7rem 0.75rem;
-            border-radius: 10px;
-            font-size: 0.88rem; 
-            color: var(--text);
-            text-decoration: none;
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s;
-            margin-bottom: 4px;
-        }
-        .nav-item:hover { background: var(--surface2); }
-        .nav-item.active {
-            background: var(--accent-pastel);
-            color: var(--accent-text);
-            font-weight: 500;
-        }
-        .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--muted); }
-        .nav-item.active svg { color: var(--accent-text); }
-        
-        .nav-badge {
-            margin-left: auto;
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--text);
-            font-size: 0.7rem; 
-            font-weight: 600;
-            padding: 2px 8px; 
-            border-radius: 20px;
-        }
-        .nav-item.active .nav-badge {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .sidebar-bottom {
-            margin-top: auto;
-            padding-top: 1rem;
-        }
-
-        .user-card {
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            padding: 0.8rem;
-            border-radius: 12px;
-            background: var(--surface-accent); /* Panel en amarillo pastel */
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-        .avatar {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--accent-pastel);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem; font-weight: 600; color: var(--accent-text);
-            flex-shrink: 0;
-        }
-        .user-info { flex: 1; min-width: 0; }
-        .user-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-role { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
-        
-        .logout-btn {
-            background: none; border: none; cursor: pointer;
-            color: var(--muted); padding: 4px; display: flex;
-            transition: color 0.15s;
-        }
+        body { font-family: 'Sora', sans-serif; color: var(--text); background: var(--bg); display: flex; min-height: 100vh; }
+ 
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 2rem 1rem 1.5rem; position: fixed; top: 0; left: 0; bottom: 0; z-index: 10; }
+        .sidebar-logo { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 2rem; padding: 0 0.75rem; }
+        .nav-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); padding: 0 0.75rem; margin-bottom: 0.5rem; margin-top: 1.2rem; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.65rem 0.75rem; border-radius: 10px; font-size: 0.87rem; color: var(--text); text-decoration: none; margin-bottom: 3px; transition: background 0.15s; }
+        .nav-item:hover { background: #f5f7fa; }
+        .nav-item.active { background: var(--accent); color: var(--accent-text); font-weight: 500; }
+        .sidebar-bottom { margin-top: auto; }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.8rem; border-radius: 12px; background: var(--surface-accent); }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: var(--accent-text); flex-shrink: 0; }
+        .user-name { font-size: 0.82rem; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .logout-form { margin: 0; }
+        .logout-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: 2px 4px; transition: color 0.15s; }
         .logout-btn:hover { color: #ef4444; }
-        .logout-btn svg { width: 18px; height: 18px; }
-
-        /* ── MAIN CONTENT ── */
-        .main {
-            margin-left: var(--sidebar-w);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .topbar {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 1.2rem 2rem;
-            display: flex; align-items: center; gap: 1rem;
-            position: sticky; top: 0; z-index: 5;
-        }
-        .topbar-title { font-size: 1.25rem; font-weight: 600; color: var(--text); }
-        .topbar-sub { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+ 
+        /* MAIN */
+        .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+        .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 5; }
+        .topbar-title { font-size: 1.2rem; font-weight: 600; }
+        .topbar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
         .topbar-actions { margin-left: auto; display: flex; gap: 10px; }
-
-        .btn-ghost {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--surface2); border: 1px solid var(--border);
-            border-radius: 8px; padding: 0.55rem 1rem;
-            font-family: 'Sora', sans-serif; font-size: 0.85rem; color: var(--text);
-            cursor: pointer; transition: background 0.15s;
-        }
-        .btn-ghost:hover { background: var(--border); }
-        .btn-ghost svg { width: 16px; height: 16px; color: var(--muted); }
-
-        .btn-accent {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--accent-pastel); border: 1px solid rgba(0,0,0,0.03);
-            border-radius: 8px; padding: 0.55rem 1.1rem;
-            font-family: 'Sora', sans-serif; font-size: 0.85rem; color: var(--accent-text); font-weight: 600;
-            cursor: pointer; transition: background-color 0.15s;
-        }
+        .btn-accent { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); border: none; border-radius: 8px; padding: 0.55rem 1rem; font-family: 'Sora', sans-serif; font-size: 0.85rem; color: var(--accent-text); font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.15s; }
         .btn-accent:hover { background: var(--accent-hover); }
-        .btn-accent svg { width: 16px; height: 16px; }
-
+        .btn-ghost { display: inline-flex; align-items: center; gap: 6px; background: #f5f7fa; border: 1px solid #eef1f6; border-radius: 8px; padding: 0.55rem 1rem; font-family: 'Sora', sans-serif; font-size: 0.85rem; color: var(--text); cursor: pointer; text-decoration: none; transition: background 0.15s; }
+        .btn-ghost:hover { background: #eef1f6; }
         .content { padding: 2rem; flex: 1; }
-
-        /* Métrica Simplificada */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.25rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
-        }
-        .stat-card-top {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 0.75rem;
-        }
-        .stat-icon {
-            width: 36px; height: 36px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .stat-icon svg { width: 18px; height: 18px; }
-        .stat-icon.blue { background: rgba(85, 127, 168, 0.1); color: var(--link-color); }
-        .stat-icon.teal { background: rgba(67, 112, 67, 0.1); color: var(--success-text); }
-        .stat-icon.amber { background: rgba(217, 119, 6, 0.1); color: var(--amber-text); }
-        
-        .stat-trend { font-size: 0.75rem; font-weight: 500; color: var(--muted); }
-        .stat-num {
-            font-size: 1.75rem; font-weight: 600; line-height: 1;
-            margin-bottom: 6px; color: var(--text);
-        }
-        .stat-label { font-size: 0.8rem; color: var(--muted); }
-
-        /* Estructura Columnas */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 1.5rem;
-        }
-
-        .section-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(160, 175, 195, 0.04);
-        }
-        .section-head {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .section-title { font-size: 0.95rem; font-weight: 600; flex: 1; color: var(--text); }
-        .section-action {
-            font-size: 0.8rem; color: var(--link-color); text-decoration: none; cursor: pointer;
-            background: none; border: none; font-family: 'Sora', sans-serif; font-weight: 500;
-        }
+ 
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+        .stat-num { font-size: 2rem; font-weight: 700; color: var(--text); }
+        .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+ 
+        /* SECCIONES */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .section-head { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; }
+        .section-title { font-size: 0.92rem; font-weight: 600; flex: 1; }
+        .section-action { font-size: 0.8rem; color: var(--accent-text); text-decoration: none; font-weight: 500; background: none; border: none; cursor: pointer; font-family: 'Sora', sans-serif; }
         .section-action:hover { text-decoration: underline; }
-
-        /* Elementos Listas Proyectos */
-        .project-item {
-            padding: 1.1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 14px;
-        }
-        .project-item:last-child { border-bottom: none; }
-        .project-item:hover { background: var(--surface2); }
-        .proj-color { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .proj-info { flex: 1; min-width: 0; }
-        .proj-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; color: var(--text); }
-        .proj-meta { font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-        
-        .proj-progress { width: 90px; }
-        .progress-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 3px; background: var(--link-color); }
-        .progress-pct { font-size: 0.75rem; color: var(--muted); margin-top: 4px; text-align: right; }
-
-        /* Lista de Tareas */
-        .task-item {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 12px;
-        }
+        .proj-item { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        .proj-item:last-child { border-bottom: none; }
+        .proj-item:hover { background: #fafbfc; }
+        .proj-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-text); flex-shrink: 0; }
+        .proj-name { font-size: 0.88rem; font-weight: 500; flex: 1; }
+        .proj-link { font-size: 0.78rem; color: var(--accent-text); text-decoration: none; }
+        .proj-link:hover { text-decoration: underline; }
+        .task-item { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
         .task-item:last-child { border-bottom: none; }
-        .task-item:hover { background: var(--surface2); }
-        
-        .task-check {
-            width: 18px; height: 18px; border: 1.5px solid var(--muted);
-            border-radius: 6px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.15s, border-color 0.15s;
-        }
-        .task-check.done { background: var(--success-text); border-color: var(--success-text); }
-        .task-check svg { width: 10px; height: 10px; stroke: #ffffff; stroke-width: 3; fill: none; }
-        
-        .task-body { flex: 1; min-width: 0; }
-        .task-name { font-size: 0.9rem; font-weight: 500; color: var(--text); }
-        .task-name.done { text-decoration: line-through; color: var(--muted); }
-        .task-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
-        
-        .task-due { font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
-        .due-soon { background: var(--amber-bg); color: var(--amber-text); }
-        .due-ok { background: var(--success-bg); color: var(--success-text); }
-        .due-late { background: var(--error-bg); color: var(--error-text); }
-
-        /* ── CALENDARIO ── */
-        .calendar-mini .section-body { padding: 1.25rem; }
-        .cal-month { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-        .cal-month-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-        .cal-nav-container { display: flex; gap: 4px; }
-        .cal-nav { 
-            background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; 
-            cursor: pointer; color: var(--text); padding: 5px 8px; display: flex; align-items: center;
-        }
-        .cal-nav:hover { background: var(--border); }
-        .cal-nav svg { width: 12px; height: 12px; }
-        
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .cal-day-hdr { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-align: center; padding: 4px 0; }
-        .cal-day {
-            font-size: 0.8rem; text-align: center; padding: 6px 0; border-radius: 8px;
-            color: var(--text); cursor: pointer; transition: background 0.12s;
-        }
-        .cal-day:hover { background: var(--surface2); }
-        .cal-day.other { color: #d0d5dd; }
-        .cal-day.today {
-            background: var(--accent-pastel);
-            color: var(--accent-text); 
-            font-weight: 600;
-        }
-
-        /* Deadlines */
-        .deadline-item {
-            padding: 0.9rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 12px;
-        }
-        .deadline-item:last-child { border-bottom: none; }
-        .deadline-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .deadline-body { flex: 1; }
-        .deadline-name { font-size: 0.85rem; font-weight: 500; color: var(--text); }
-        .deadline-proj { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
-        .deadline-date { font-size: 0.78rem; color: var(--error-text); font-weight: 500; }
-
-        @media (max-width: 1024px) {
-            .main-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        .task-estado { font-size: 0.72rem; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+        .estado-pendiente { background: #fef3c7; color: #d97706; }
+        .estado-progreso { background: #dbeafe; color: #2563eb; }
+        .estado-revision { background: #ede9fe; color: #7c3aed; }
+        .estado-finalizado { background: #d1fae5; color: #059669; }
+        .task-titulo { font-size: 0.87rem; font-weight: 500; flex: 1; }
+        .task-fecha { font-size: 0.75rem; color: var(--muted); }
+        .empty-msg { padding: 2.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
     </style>
 </head>
 <body>
-
+ 
 <aside class="sidebar">
-    <p class="nav-section-label">Principal</p>
-    <a class="nav-item active" th:href="@{/dashboard}">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Inicio
-    </a>
-    <a class="nav-item" href="#">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        Proyectos
-        <span class="nav-badge">4</span>
-    </a>
-    <a class="nav-item" href="#">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Tareas
-        <span class="nav-badge">12</span>
-    </a>
-
-    <p class="nav-section-label">Equipo</p>
-    <a class="nav-item" href="#">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        Colaboradores
-    </a>
-
-   <div class="sidebar-bottom">
+    <div class="sidebar-logo">📋 GestorApp</div>
+    <p class="nav-label">Principal</p>
+    <a class="nav-item active" th:href="@{/dashboard}">🏠 Inicio</a>
+    <a class="nav-item" th:href="@{/proyectos}">📁 Proyectos</a>
+    <div class="sidebar-bottom">
         <div class="user-card">
-            <div class="avatar" id="userAvatar" 
-         th:text="${usuarioConectado != null and #strings.length(usuarioConectado.nombre) > 0 ? #strings.toUpperCase(#strings.substring(usuarioConectado.nombre, 0, 1)) : 'U'}">
-        D
-    </div>
-    <div class="user-info">
-                <div class="user-name" id="profileName" th:text="${usuarioConectado != null ? usuarioConectado.nombre : 'Usuario'}">María García</div>
-            <form th:action="@{/logout}" method="post" style="margin:0">
+            <div class="avatar"
+                 th:text="${usuarioConectado != null ? #strings.toUpperCase(#strings.substring(usuarioConectado.nombre,0,1)) : 'U'}">U</div>
+            <div class="user-name" th:text="${usuarioConectado?.nombre}">Usuario</div>
+            <form th:action="@{/logout}" method="post" class="logout-form">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <button type="submit" class="logout-btn" title="Cerrar sesión">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
+                <button type="submit" class="logout-btn" title="Cerrar sesión">✕</button>
             </form>
         </div>
     </div>
 </aside>
-
-<main class="main">
+ 
+<div class="main">
     <div class="topbar">
         <div>
-            <h1 class="topbar-title">Panel de control</h1>
-            <div class="topbar-sub" id="topbarRealDate">Mayo 2026</div>
+            <div class="topbar-title">Panel de control</div>
+            <div class="topbar-sub" id="topbarDate"></div>
         </div>
         <div class="topbar-actions">
-            <button class="btn-ghost">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Buscar
-            </button>
-            <button class="btn-accent">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuevo proyecto
-            </button>
+            <a th:href="@{/proyectos}" class="btn-ghost">📁 Mis proyectos</a>
+            <a th:href="@{/proyectos/nuevo}" class="btn-accent">+ Nuevo proyecto</a>
         </div>
     </div>
-
+ 
     <div class="content">
+        <!-- STATS -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-card-top">
-                    <div class="stat-icon blue">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                    </div>
-                    <span class="stat-trend">+2 esta semana</span>
-                </div>
-                <div class="stat-num">4</div>
+                <div class="stat-num" th:text="${totalProyectos}">0</div>
                 <div class="stat-label">Proyectos activos</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-top">
-                    <div class="stat-icon teal">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                    </div>
-                    <span class="stat-trend">+5 hoy</span>
-                </div>
-                <div class="stat-num">12</div>
+                <div class="stat-num" th:text="${tareasPendientes}">0</div>
                 <div class="stat-label">Tareas pendientes</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-top">
-                    <div class="stat-icon amber">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <span class="stat-trend">3 próximas</span>
-                </div>
-                <div class="stat-num">3</div>
-                <div class="stat-label">Entregas urgentes</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-top">
-                    <div class="stat-icon teal">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                    </div>
-                    <span class="stat-trend">↑ 8%</span>
-                </div>
-                <div class="stat-num">74%</div>
-                <div class="stat-label">Progreso general</div>
+                <div class="stat-num" th:text="${tareasUrgentes}">0</div>
+                <div class="stat-label">Vencen pronto</div>
             </div>
         </div>
-
+ 
+        <!-- GRID -->
         <div class="main-grid">
-            <div style="display:flex; flex-direction:column; gap:1.5rem;">
-                <div class="section-card">
-                    <div class="section-head">
-                        <span class="section-title">Mis proyectos</span>
-                        <button class="section-action">Ver todos</button>
-                    </div>
-                    <div class="project-item">
-                        <div class="proj-color" style="background:#557fa8"></div>
-                        <div class="proj-info">
-                            <div class="proj-name">Sistema de Inventario — BD II</div>
-                            <div class="proj-meta">3 integrantes &nbsp;·&nbsp; Entrega 28 may</div>
-                        </div>
-                        <div class="proj-progress">
-                            <div class="progress-bar"><div class="progress-fill" style="width:68%"></div></div>
-                            <div class="progress-pct">68%</div>
-                        </div>
-                    </div>
-                    <div class="project-item">
-                        <div class="proj-color" style="background:#437043"></div>
-                        <div class="proj-info">
-                            <div class="proj-name">App móvil — Proyecto Integrador</div>
-                            <div class="proj-meta">5 integrantes &nbsp;·&nbsp; Entrega 15 jun</div>
-                        </div>
-                        <div class="proj-progress">
-                            <div class="progress-bar"><div class="progress-fill" style="width:41%"></div></div>
-                            <div class="progress-pct">41%</div>
-                        </div>
-                    </div>
+            <!-- PROYECTOS -->
+            <div class="section-card">
+                <div class="section-head">
+                    <span class="section-title">Mis proyectos</span>
+                    <a th:href="@{/proyectos}" class="section-action">Ver todos</a>
                 </div>
-
-                <div class="section-card">
-                    <div class="section-head">
-                        <span class="section-title">Tareas recientes</span>
-                        <button class="section-action">Ver todas</button>
-                    </div>
-                    <div class="task-item">
-                        <div class="task-check done">
-                            <svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg>
-                        </div>
-                        <div class="task-body">
-                            <div class="task-name done">Diagrama ER — BD II</div>
-                            <div class="task-sub">Sistema de Inventario <span class="task-due due-ok">Completada</span></div>
-                        </div>
-                    </div>
-                    <div class="task-item">
-                        <div class="task-check"></div>
-                        <div class="task-body">
-                            <div class="task-name">Implementar login en Spring Boot</div>
-                            <div class="task-sub">App móvil <span class="task-due due-soon">Vence mañana</span></div>
-                        </div>
-                    </div>
-                    <div class="task-item">
-                        <div class="task-check"></div>
-                        <div class="task-body">
-                            <div class="task-name">Análisis de complejidad O(n)</div>
-                            <div class="task-sub">Análisis de Algoritmos <span class="task-due due-late">Vence hoy</span></div>
-                        </div>
+                <div class="empty-msg" th:if="${proyectos.isEmpty()}">
+                    No tienes proyectos aún.<br>
+                    <a th:href="@{/proyectos/nuevo}" style="color:#4a6fa5">Crea el primero →</a>
+                </div>
+                <div th:each="p, pStat : ${proyectos}" th:if="${pStat.index < 5}">
+                    <div class="proj-item">
+                        <div class="proj-dot"></div>
+                        <div class="proj-name" th:text="${p.nombre}">Proyecto</div>
+                        <a th:href="@{/tareas/proyecto/{id}(id=${p.id})}" class="proj-link">Ver tareas →</a>
                     </div>
                 </div>
             </div>
-
-            <div class="right-col">
-                <div class="section-card calendar-mini">
-                    <div class="section-body">
-                        <div class="cal-month">
-                            <span class="cal-month-name" id="calMonthName">Mayo 2026</span>
-                            <div class="cal-nav-container">
-                                <button class="cal-nav" onclick="changeMonth(-1)" aria-label="Mes anterior">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"/></svg>
-                                </button>
-                                <button class="cal-nav" onclick="changeMonth(1)" aria-label="Mes siguiente">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="cal-grid" style="margin-bottom:6px;">
-                            <div class="cal-day-hdr">Lu</div><div class="cal-day-hdr">Ma</div><div class="cal-day-hdr">Mi</div>
-                            <div class="cal-day-hdr">Ju</div><div class="cal-day-hdr">Vi</div><div class="cal-day-hdr">Sa</div><div class="cal-day-hdr">Do</div>
-                        </div>
-                        <div class="cal-grid" id="calDaysContainer"></div>
-                    </div>
+ 
+            <!-- TAREAS -->
+            <div class="section-card">
+                <div class="section-head">
+                    <span class="section-title">Tareas recientes</span>
                 </div>
-
-                <div class="section-card">
-                    <div class="section-head">
-                        <span class="section-title">Próximos vencimientos</span>
-                    </div>
-                    <div class="deadline-item">
-                        <div class="deadline-dot" style="background:#ef4444"></div>
-                        <div class="deadline-body">
-                            <div class="deadline-name">Parcial Algoritmos</div>
-                            <div class="deadline-proj">Análisis de Algoritmos</div>
-                        </div>
-                        <div class="deadline-date">Hoy</div>
-                    </div>
-                    <div class="deadline-item">
-                        <div class="deadline-dot" style="background:#fbbf24"></div>
-                        <div class="deadline-body">
-                            <div class="deadline-name">Entrega Base de Datos</div>
-                            <div class="deadline-proj">Sistema de Inventario</div>
-                        </div>
-                        <div class="deadline-date">28 May</div>
+                <div class="empty-msg" th:if="${tareas.isEmpty()}">
+                    No hay tareas aún.
+                </div>
+                <div th:each="t, tStat : ${tareas}" th:if="${tStat.index < 6}">
+                    <div class="task-item">
+                        <div class="task-titulo" th:text="${t.titulo}">Tarea</div>
+                        <span class="task-estado"
+                              th:classappend="${t.estado.nombreEstado == 'Pendiente'} ? 'estado-pendiente' :
+                                             (${t.estado.nombreEstado == 'En Progreso'} ? 'estado-progreso' :
+                                             (${t.estado.nombreEstado == 'En Revisión'} ? 'estado-revision' : 'estado-finalizado'))"
+                              th:text="${t.estado.nombreEstado}">Estado</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</main>
-
+</div>
+ 
 <script>
-    // CAPTURA AUTOMÁTICA DE LA FECHA REAL DEL SISTEMA
-    const realToday = new Date(); 
-    const realDay = realToday.getDate();
-    const realMonth = realToday.getMonth();
-    const realYear = realToday.getFullYear();
-
-    // Variables de control de navegación del calendario
-    let currentMonth = realMonth;
-    let currentYear = realYear;
-
-    const monthNames = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-    
-    const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-    function renderCalendar(month, year) {
-        const monthNameElement = document.getElementById("calMonthName");
-        const daysContainer = document.getElementById("calDaysContainer");
-        
-        monthNameElement.textContent = `${monthNames[month]} ${year}`;
-        daysContainer.innerHTML = "";
-
-        // Obtener el primer día del mes seleccionado
-        const firstDayDate = new Date(year, month, 1);
-        let firstDayIndex = firstDayDate.getDay();
-        
-        // Conversión para hacer que el lunes sea el índice 0 (0=Lu, 1=Ma... 6=Do)
-        firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
-
-        // Obtener cantidad total de días del mes actual
-        const totalDays = new Date(year, month + 1, 0).getDate();
-        
-        // Obtener cantidad total de días del mes anterior para relleno
-        const prevMonthTotalDays = new Date(year, month, 0).getDate();
-
-        // 1. Rellenar días del mes anterior (estilo gris opaco)
-        for (let i = firstDayIndex - 1; i >= 0; i--) {
-            const dayDiv = document.createElement("div");
-            dayDiv.classList.add("cal-day", "other");
-            dayDiv.textContent = prevMonthTotalDays - i;
-            daysContainer.appendChild(dayDiv);
-        }
-
-        // 2. Pintar los días reales del mes corriente
-        for (let day = 1; day <= totalDays; day++) {
-            const dayDiv = document.createElement("div");
-            dayDiv.classList.add("cal-day");
-            dayDiv.textContent = day;
-
-            // EVALUACIÓN REAL DE HOY: Se marca la celda únicamente si el día, mes y año coinciden con la fecha actual del reloj
-            if (day === realDay && month === realMonth && year === realYear) {
-                dayDiv.classList.add("today");
-            }
-            
-            daysContainer.appendChild(dayDiv);
-        }
-
-        // 3. Rellenar días del mes siguiente para completar la grilla
-        const totalCellsFilled = firstDayIndex + totalDays;
-        const remainingCells = totalCellsFilled % 7 === 0 ? 0 : 7 - (totalCellsFilled % 7);
-        
-        for (let i = 1; i <= remainingCells; i++) {
-            const dayDiv = document.createElement("div");
-            dayDiv.classList.add("cal-day", "other");
-            dayDiv.textContent = i;
-            daysContainer.appendChild(dayDiv);
-        }
-    }
-
-    function changeMonth(direction) {
-        currentMonth += direction;
-        
-        // Controlar cambio de año automático si pasa de diciembre o baja de enero
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        } else if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        
-        renderCalendar(currentMonth, currentYear);
-    }
-
-    // Inyectar fecha legible real en el Topbar (Ej: "Jueves, 28 de mayo 2026")
-    function initTopbarDate() {
-        const topbarDateElement = document.getElementById("topbarRealDate");
-        if (topbarDateElement) {
-            topbarDateElement.textContent = `${dayNames[realToday.getDay()]}, ${realDay} de ${monthNames[realMonth].toLowerCase()} ${realYear}`;
-        }
-    }
-
-    // Inicialización del Dashboard al cargar la página
-    document.addEventListener("DOMContentLoaded", () => {
-        initTopbarDate();
-        renderCalendar(currentMonth, currentYear);
-    });
+    const d = new Date();
+    const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+    document.getElementById('topbarDate').textContent =
+        `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()}`;
 </script>
 </body>
 </html>
