@@ -15,12 +15,25 @@ public class ProyectoController {
 
     @Autowired private ProyectoRepository proyectoRepo;
     @Autowired private UsuarioRepository usuarioRepo;
+    @Autowired private TareaRepository tareaRepo;
 
     @GetMapping
     public String listar(Model model, Principal principal) {
         Usuario usuario = usuarioRepo.findByCorreo(principal.getName()).orElse(null);
         List<Proyecto> proyectos = proyectoRepo.findByUsuarioOrderByFechaCreacionDesc(usuario);
+
+        // Mapa de progreso por proyecto: tareas finalizadas / total
+        java.util.Map<Integer, int[]> progreso = new java.util.HashMap<>();
+        for (Proyecto p : proyectos) {
+            List<uts.edu.java.entity.Tarea> tareas = tareaRepo.findByProyecto(p);
+            long finalizadas = tareas.stream()
+                .filter(t -> t.getEstado().getNombreEstado().equalsIgnoreCase("Finalizado"))
+                .count();
+            progreso.put(p.getId(), new int[]{(int) finalizadas, tareas.size()});
+        }
+
         model.addAttribute("proyectos", proyectos);
+        model.addAttribute("progreso", progreso);
         model.addAttribute("usuarioConectado", usuario);
         return "proyectos/lista";
     }
